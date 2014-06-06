@@ -16,5 +16,5 @@
     <author href="http://1callgroup.com" email="limshad@1callgroup.com">
        Limshad
     </author>
-
+   <icon src="icon.png" />
 </widget>
