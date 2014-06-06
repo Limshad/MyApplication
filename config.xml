@@ -7,14 +7,14 @@
 
     <!-- versionCode is optional and Android only -->
 
-    <name>PhoneGap Example</name>
+    <name>Budget</name>
 
     <description>
-        An example for phonegap build docs. 
+       Budget Booking Engine. 
     </description>
 
-    <author href="https://build.phonegap.com" email="limshad@1callgroup.com">
-        Hardeep Shoker 
+    <author href="http://1callgroup.com" email="limshad@1callgroup.com">
+       Limshad
     </author>
 
 </widget>
