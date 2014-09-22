@@ -6,12 +6,11 @@ $(function() {
 			$('.loading').fadeIn('slow');
 			var id = $('#email_id').val();
 			alert(id);
-			$.post("<?php echo site_url('booking/ajax_cities'); ?>", {
+			$.post("http://dev.1callgroup.com/mylike/index.php", {
                 id: id,
             },
             function(data) {
-               $('#con_city').html(data);
-			   $('select').chosen();
+               $('#result').html(data);
 			   $('.loading').fadeOut('slow');
             });
 			 
@@ -19,7 +18,7 @@ $(function() {
 			
 		});		
 </script>
-
+<span id="result"></span>
 <input type="text" name="email_id" id="email_id" placeholder="Email Id" /><br>
  
 <br />
