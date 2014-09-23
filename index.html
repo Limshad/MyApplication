@@ -1,27 +1,53 @@
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="" lang="">
+<head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-<script>
-$(function() {
-			$('#like').click(function(){
-			$('.loading').fadeIn('slow');
-			var id = $('#email_id').val();
-			alert(id);
-			$.post("http://dev.1callgroup.com/mylike/index.php", {
-                id: id,
-            },
-            function(data) {
-				alert(data);
-               $('#result').html(data);
-			   $('.loading').fadeOut('slow');
-            });
-			 
-			});
-			
-		});		
-</script>
-<span id="result"></span>
-<input type="text" name="email_id" id="email_id" placeholder="Email Id" /><br>
+<script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.js"></script>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.css" />
+<style>
+
+body,form,img,h1,h2,h3,h4,h5,p,a,div,ul,li{
+	padding:0;
+	margin:0;
+	border:0;
+}
+input,textarea,a{
+	outline:0;
+}
+body{
+	font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+	font-size:13px;
+	color:#000;
+	background:#b7c2c5;
+	overflow-x:hidden;
  
-<br />
-<input type="button" value="Like"  id="like"/>
-<div id="message"></div>
+}
+#wrapper{
+	width: 90%;
+	margin: 0 auto;
+ 	position: relative;
+	z-index: 100;
+	
+}
+.thumb{width:50%;}
+.like {
+ margin: 0 auto;
+ width: 100%;
+ margin-bottom:40px;
+}
+
+@media screen and (min-width: 320px) and (max-width: 720px){
+	.thumb{width:100%;
+	margin-top: 30%;
+	}
+	
+	}
+</style>
+</head>
+<body>
+<div id="wrapper">
+<div class="like" align="center"><img  class="thumb" src="images/like.png" /></div>
+<div align="center"> <img src="images/start.png"  style="width:30%;"   /></div>
+</div> 
+</body>
+</html>
