@@ -102,7 +102,8 @@ div.loading {
     text-align: center;
 } 
 
- 
+    .stext {font-size:1em; color:#FFF;}
+
 	.textbox {
     width: 100%;
     border: solid 1px #416d96;

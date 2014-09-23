@@ -44,12 +44,15 @@ function IsEmail(email) {
 			
 			   $('#email_id').removeClass("error");
 				$.post("http://dev.1callgroup.com/mylike/index.php", {
-					id: id,
+					email: email, name: name,
 				},
 				function(data) {
-					alert(data);
-				   $('#result').html(data);
+			       $('#per_name').html(data);
+				   $('#successpage').show();
+				   $('#success').hide();
 				   $('.loading').fadeOut('slow');
+				   var delay = 5000; 
+				   setTimeout(function(){ window.location = 'index.html'; }, delay);
 				});
 				} 
 				});
@@ -64,15 +67,17 @@ function IsEmail(email) {
 <div class="loading" ></div>
 <div id="wrapper">
 <div class="like" align="center"><img  class="thumblike" src="images/like.png" /></div>
-<span id="success"  style="display:none;">
+<span id="success"  style="display:;">
 <div align="center" class="next"> <input type="text" class="textbox"  name="name" id="name" placeholder="YOUR NAME" /></div>
 <div align="center" class="next"> <input type="text" class="textbox"  name="email_id" id="email_id" placeholder="YOUR EMAIL" /></div>
 <div   align="center" class="nextnone"><img  class="thumblikebutton" id="like" src="images/likebutton.png"    /></div>
 </span>
-<div align="center" class="stext" > Thank you Limshad.</div>
+<span id="successpage"  style="display:none;">
+<div align="center" class="stext" > Thank you <span id="per_name"></span>.</div>
 <div align="center" class="stext" > You are awesome.</div>
 <div class="next" align="center"><img  class="thumbpage" src="images/page.png" /></div>
 <div align="center" class="stext" > http://www.facebook.com/1CallGroup</div>
+</span>
 </div> 
 </body>
 </html>
