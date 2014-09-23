@@ -59,7 +59,26 @@ body{
 input.placeholder {
     text-align: center;
 } 
-
+div.loading {
+    background: url("../images/loading.gif") no-repeat scroll center center transparent;
+    display: none;
+    font: 16px Tahoma,Geneva,sans-serif;
+    height: 100px;
+    left: 50%;
+    margin-left: -50px;
+    margin-top: -50px;
+    overflow: auto;
+    padding: 10px;
+    position: fixed;
+    text-align: center;
+    top: 50%;
+    width: 100px;
+    z-index: 2;
+}
+.error {
+    border: solid 2px #900;  
+}
+.stext {font-size:2em; color:#FFF;}
 @media all and (min-width: 320px) and (max-width: 800px){
 	.thumb{width:100%;
 	margin-top: 30%;
