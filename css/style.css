@@ -46,13 +46,14 @@ body{
 .textbox {
     width: 40%;
     border: solid 1px #416d96;
-    height: 65px;
+    height: 50px;
     background: #416d96;
     text-align:center;
     font-family: sans-serif;
     font-size: 2em;
     color: #FFF;
     text-shadow: 0 -1px 0 #FFF;
+	padding:10px;
 
 }
 input.placeholder {
@@ -66,24 +67,28 @@ input.placeholder {
 	.thumblike{width:100%;
 	margin-top: 3%;
 	}
-	.thumblikebutton{width:50%;
+	.thumblikebutton{width:40%;
 	margin-top: 10%;
 	}
 	.nextnone {
- margin: 0 auto;
- width: 100%;
+	 margin: 0 auto;
+ 	width: 100%;
  
  
-}
+	}
+	input.placeholder {
+    text-align: center;
+} 
+
  
 	.textbox {
     width: 100%;
     border: solid 1px #416d96;
-    height: 65px;
+    height: 50px;
     background: #416d96;
     text-align:center;
     font-family: sans-serif;
-   
+   padding:10px;
     color: #FFF;
     text-shadow: 0 -1px 0 #FFF;
 
