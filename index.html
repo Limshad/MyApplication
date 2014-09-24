@@ -54,11 +54,11 @@ $(document).ready(function(){
                     var len = results.rows.length;
                     if(len != 0)
 						{
-                    	$.mobile.changePage($("#index"), { transition : "slide"});
+                    	 $('#index').show();
 						}
 					else
 						{
-							
+						 $('#likepage').show();	
 						}	
                     $.mobile.hidePageLoadingMsg();
                 }
@@ -70,7 +70,7 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
- <div data-role="page" id="index">
+ <div data-role="page" id="index" style="display:none;">
  <div id="wrapper">
 <div class="like" align="center"><img  class="thumblike" src="images/like.png" /></div>
  
@@ -81,7 +81,7 @@ $(document).ready(function(){
  
 </div>
  </div>
- <div data-role="page" id="likepage">
+ <div data-role="page" id="likepage"  style="display:none;">
 <div id="wrapper">
 <div class="like" align="center"><img  class="thumb" src="images/like.png" /></div>
 <div align="center"><a href="info.html"> <img src="images/start.png"  style="width:60%;"   /></a></div>
