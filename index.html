@@ -52,7 +52,7 @@ $(document).ready(function(){
 				function querySuccess(tx, results){
                     $.mobile.showPageLoadingMsg(true);
                     var len = results.rows.length;
-                    if(len == 0)
+                    if(len != 0)
 						{
                     	$.mobile.changePage($("#index"), { transition : "slide"});
 						}
