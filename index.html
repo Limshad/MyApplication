@@ -1,61 +1,91 @@
-<!DOCTYPE html> 
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="" lang="">
+
 <head>
-<meta charset="UTF-8">
-<title>jQuery Mobile Web App</title>
-<link href="jquery.mobile-1.0.min.css" rel="stylesheet" type="text/css"/>
-<script src="jquery-1.6.4.min.js" type="text/javascript"></script>
-<script src="jquery.mobile-1.0.min.js" type="text/javascript"></script>
-<script type="text/ecmascript">
-
-function submitForm()
-{
-	var uname = $('[name="username"]').val();
-	var email = $('[name="email"]').val();
-	
-	window.localStorage.setItem("username",uname);
-	window.localStorage['email'] = email;
-	
-	$.mobile.changePage("#page2",{reverse:false,transition:"slide"});
-	
-	$('#output').html("Username: " + window.localStorage.getItem("username") + "<br/>" +
-	"Email: " + window.localStorage["email"]);
-	
-	return false;
-}
-
-</script>
-</head> 
-<body> 
-
-<div data-role="page" id="page1">
-	<div data-role="header">
-		<h1>Form</h1>
-	</div>
-	<div data-role="content">	
-		 <form method="POST" onSubmit="return submitForm()" data-ajax="false">
-         <label class="ui-hidden-accessible">Username</label><input name="username" type="text" placeholder="Username">
-          <input name="email" type="text" placeholder="Email"> 
-         <input type="submit" value="Submit">
-         
-         </form>
-	</div>
-	
-</div>
-
-<div data-role="page" id="page2">
-	<div data-role="header">
-		<h1>Page Two</h1>
-	</div>
-	<div data-role="content">	
-		<div id="output"
-        
-        </div>
-	</div>
-	 
-</div>
-
+ <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/jquery.mobile-1.3.1.min.css">
+<script type="text/javascript" charset="utf-8" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/jquery.mobile-1.3.1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script>
+$(document).ready(function(){
  
-
+                document.addEventListener("deviceready", onDeviceReady, false);
+                 
+                var db = window.openDatabase("Database", "1.0", "member_details", 200000);
+ 
+                function onDeviceReady(){
+                    //Populate the databse
+                    db.transaction(populateDB, errorCB, successCB);
+                    //Override the back button functionality
+                    document.addEventListener('backbutton', onBack, false);
+                }
+                 
+                function onBack(){
+                    //If the current page is index page then exit other wise navigate to index page
+                    if($.mobile.activePage.is('#index')){
+                        navigator.app.exitApp();
+                    }
+                    else{
+                        db.transaction(queryDB, errorCB);
+                    }
+                }               
+ 
+                function populateDB(tx){
+                    //Create the table
+                    //tx.executeSql('DROP TABLE IF EXISTS MyContacts');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS tbl_memeber (id INTEGER PRIMARY KEY AUTOINCREMENT, \
+                            name TEXT NOT NULL, password TEXT,  email TEXT)\
+                             ');
+                    tx.executeSql('SELECT id, name, email FROM tbl_memeber ORDER BY name', [], querySuccess, errorCB);
+                }
+ 
+                function successCB(){
+                    db.transaction(queryDB, errorCB);
+                }
+				
+				function queryDB(tx){
+                    tx.executeSql('SELECT id, name, email FROM tbl_memeber ORDER BY name', [], querySuccess, errorCB);
+                }
+				function querySuccess(tx, results){
+                    $.mobile.showPageLoadingMsg(true);
+                    var len = results.rows.length;
+                    if(len == 0)
+						{
+                    	$.mobile.changePage($("#index"), { transition : "slide"});
+						}
+					else
+						{
+							
+						}	
+                    $.mobile.hidePageLoadingMsg();
+                }
+ 
+                function errorCB(err){
+ 
+                }     
+});
+</script>
+</head>
+<body>
+ <div data-role="page" id="index">
+ <div id="wrapper">
+<div class="like" align="center"><img  class="thumblike" src="images/like.png" /></div>
+ 
+<div align="center" class="next"> <input type="text" class="textbox"  name="name" id="name" placeholder="YOUR NAME" /></div>
+<div align="center" class="next"> <input type="text" class="textbox"  name="email_id" id="email_id" placeholder="YOUR EMAIL" /></div>
+<div   align="center" class="nextnone"><img  class="thumblikebutton" id="like" src="images/likebutton.png"    /></div>
+ 
+ 
+</div>
+ </div>
+ <div data-role="page" id="likepage">
+<div id="wrapper">
+<div class="like" align="center"><img  class="thumb" src="images/like.png" /></div>
+<div align="center"><a href="info.html"> <img src="images/start.png"  style="width:60%;"   /></a></div>
+</div> 
+</div>
 </body>
 </html>
