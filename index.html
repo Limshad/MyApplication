@@ -52,7 +52,8 @@ $(document).ready(function(){
 				function querySuccess(tx, results){
                     $.mobile.showPageLoadingMsg(true);
                     var len = results.rows.length;
-                    if(len != 0)
+					alert(len);
+                    if(len == 0)
 						{
                     	 $('#index').show();
 						}
