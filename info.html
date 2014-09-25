@@ -4,27 +4,101 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.js"></script>
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.css" />
+<script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
 <link rel="stylesheet" type="text/css" href="css/style.css" />
-<script>
-function IsEmail(email) {
-        var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        if(!regex.test(email)) {
-           return false;
-        }else{
-           return true;
-        }
-      }
-</script>
-<script>
+ 
+<script type="text/javascript" charset="utf-8">
+  // global variables
+var db;
+var shortName = 'Kiosk';
+var version = '1.0';
+var displayName = 'Kiosk';
+var maxSize = 65535;
+
+// this is called when an error happens in a transaction
+function errorHandler(transaction, error) {
+   alert('Error: ' + error.message + ' code: ' + error.code);
+
+}
+
+// this is called when a successful transaction happens
+function successCallBack() {
+  // alert("DEBUGGING: success");
+}
+
+
+function nullHandler(){};
+
+function onBodyLoad(){
+
+ 
+
+	 if (!window.openDatabase) {
+	  
+	   alert('Databases are not supported in this browser.');
+	   return;
+	 }
+
+	 
+	 db = openDatabase(shortName, version, displayName,maxSize);
+
+	
+	 db.transaction(function(tx){
+
+		 // tx.executeSql('DROP TABLE IF EXISTS member');
+		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[],nullHandler,errorHandler);
+	 },errorHandler,successCallBack);
+	  db.transaction(function(transaction) {
+	   transaction.executeSql('SELECT * FROM member;', [],
+	     function(transaction, result) {
+	      if (result != null && result.rows != null) {
+			 // alert(result.rows.length);
+			  if(result.rows.length == 0)
+			  	{
+				window.location = 'index.html';	
+				}
+		      var row = result.rows.item(0);
+		      $('#email_id_sel').val(row.email); 
+			  var simage = row.imagesrc;
+			  var facelinkup = row.facelink;
+			//  alert(simage);
+			  //alert(facelinkup);
+			   $('#mypage').attr('src', 'http://dev.1callgroup.com/kiosk/assets/customer_last_images/'+simage);
+			  $('#facebook_link').html('http://facebook.com/'+facelinkup)
+	      }
+	     },errorHandler);
+	 },errorHandler,nullHandler);
+}
+
+ function DisableToDB() {
+
+	 if (!window.openDatabase) {
+	   alert('Databases are not supported in this browser.');
+	   return;
+	 }
+ 
+	// this is the section that actually inserts the values into the User table
+	 db.transaction(function(transaction) {
+		 
+		transaction.executeSql('DROP TABLE IF EXISTS member',[], nullHandler, errorHandler);
+	});
+ 
+	 return false;
+}
+ 
+ 
+
 	$(function() {
 			$('#like').click(function(){
 				$('.loading').fadeIn('slow');
 			var email = $('#email_id').val();
 			var name = $('#name').val();
+			var email_sel = $('#email_id_sel').val();
 			
 			if(name == '')
 				{
-					alert(name);
+					//alert(name);
 				$('#name').addClass("error");
 				return false; 	
 				}
@@ -43,29 +117,53 @@ function IsEmail(email) {
 			else {	
 			
 			   $('#email_id').removeClass("error");
-				$.post("http://dev.1callgroup.com/mylike/index.php", {
-					email: email, name: name,
+				$.post("http://dev.1callgroup.com/kiosk/mylike/index.php", {
+					email: email, name: name,email_sel: email_sel,
 				},
 				function(data) {
-			       $('#per_name').html(data);
-				   $('#successpage').show();
-				   $('#success').hide();
-				   $('.loading').fadeOut('slow');
-				   var delay = 5000; 
-				   setTimeout(function(){ window.location = 'index.html'; }, delay);
+				   var response = JSON.parse(data);
+				  // alert(response.status);
+				   if(response.status ==1)
+						{
+			           $('#per_name').html(response.name);
+				  	   $('#successpage').show();
+				       $('#success').hide();
+				       $('.loading').fadeOut('slow');
+				       var delay = 7000; 
+				       setTimeout(function(){ window.location = 'info.html'; }, delay);
+					   	}
+					else if(response.status ==0)
+						{
+						alert('Failed');
+						$('.loading').fadeOut('slow');
+						}
+					else if(response.status ==2)
+						{
+						DisableToDB();
+						window.location = 'index.html';
+						}	
 				});
 				} 
 				});
 			
 				});	
 
-				
+	function IsEmail(email) {
+        var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if(!regex.test(email)) {
+           return false;
+        }else{
+           return true;
+        }
+      }			
 			
 </script>
 </head>
-<body>
+<body onload="onBodyLoad()">
 <div class="loading" ></div>
 <div id="wrapper">
+<input type="hidden" class="textbox"  name="email_id_sel" id="email_id_sel" />
+
 <div class="like" align="center"><img  class="thumblike" src="images/like.png" /></div>
 <span id="success"  style="display:;">
 <div align="center" class="next"> <input type="text" class="textbox"  name="name" id="name" placeholder="YOUR NAME" /></div>
@@ -75,8 +173,8 @@ function IsEmail(email) {
 <span id="successpage"  style="display:none;">
 <div align="center" class="stext" > Thank you <span id="per_name"></span>.</div>
 <div align="center" class="stext" > You are awesome.</div>
-<div class="next" align="center"><img  class="thumbpage" src="images/page.png" /></div>
-<div align="center" class="stext" > http://www.facebook.com/1CallGroup</div>
+<div class="next" align="center"><img id="mypage"  class="thumbpage" src="" /></div>
+<div align="center" class="stext"  id="facebook_link"> </div>
 </span>
 </div> 
 </body>

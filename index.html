@@ -47,18 +47,21 @@ function onBodyLoad(){
 	
 	 db.transaction(function(tx){
 
-		//  tx.executeSql('DROP TABLE IF EXISTS member');
-		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT)',[],nullHandler,errorHandler);
+		  //tx.executeSql('DROP TABLE IF EXISTS member');
+		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[],nullHandler,errorHandler);
 	 },errorHandler,successCallBack);
 	  db.transaction(function(transaction) {
 	   transaction.executeSql('SELECT * FROM member;', [],
 	     function(transaction, result) {
 	      if (result != null && result.rows != null) {
-			  alert(result.rows.length);
+			  //alert(result.rows.length);
+			  if(result.rows.length > 0)
+			  	{
+				window.location = 'info.html';	
+				}
 		      var row = result.rows.item(0);
 		 
-			 $('#email_id_sel').val(row.email);  
-			 $('#name_sel').val(row.name); 
+			 
 	      }
 	     },errorHandler);
 	 },errorHandler,nullHandler);
@@ -67,7 +70,7 @@ function onBodyLoad(){
  
  
 // this is the function that puts values into the database using the values from the text boxes on the screen
-function AddValueToDB(name,email) {
+function AddValueToDB(name,email,image,facelink) {
 
 	 if (!window.openDatabase) {
 	   alert('Databases are not supported in this browser.');
@@ -76,7 +79,7 @@ function AddValueToDB(name,email) {
 
 	// this is the section that actually inserts the values into the User table
 	 db.transaction(function(transaction) {
-		transaction.executeSql('INSERT INTO member(name, email)VALUES (?,?)',[name, email], nullHandler, errorHandler);
+		transaction.executeSql('INSERT INTO member(name, email,imagesrc,facelink) VALUES (?,?,?,?)',[name, email,image,facelink], nullHandler, errorHandler);
 	});
  
 	 return false;
@@ -108,28 +111,31 @@ $('#like').click(function(){
 				return false; 	
 				}		
 			else {	
-			alert('sds');
+			//alert('sds');
 			   $('#email_id').removeClass("error");
 				$.post("http://dev.1callgroup.com/kiosk/mylike/configure.php", {
 					email: email, password: password,
 				},
 				function(data) {
-					alert('sdsd');
+					//alert('sdsd');
 			      var response = JSON.parse(data);
 					if(response.status ==1)
 						{
-						alert(response.email);
-						alert(response.name);
-						email_sel =  response.email;
-						name_sel =  response.name;
+						//alert(response.email);
+						//alert(response.name);
+						var email_sel =  response.email;
+						var name_sel =  response.name;
+						var image_sel =  response.image;
+						var facelink =  response.facelink;
 				 		$('.loading').fadeOut('slow');
-						AddValueToDB(name_sel,email_sel);
+						AddValueToDB(name_sel,email_sel,image_sel,facelink);
 						window.location = 'index.html'; 
 						}
 					if(response.status ==0)
 						{
 						 
 						alert('Failed');
+						$('.loading').fadeOut('slow');
 						}
 							
 				});
@@ -158,12 +164,12 @@ $('#like').click(function(){
         <div data-role="page" id="index">
           <div class="loading" ></div>
             <div id="wrapper">
-           <div class="like" align="center"><img  class="thumblike" src="images/config.png" /></div>
+            <div class="" align="center"><img  class="thumbconfig" src="images/config.png" /></div><br>
             <span id="success"  style="display:;">
-           <input type="text" class="textbox"  name="email_id_sel" id="email_id_sel" /><input type="text" class="textbox"  name="name_sel" id="name_sel" />
+           
             <div align="center" class="next"> <input type="text" class="textbox"  name="email_id" id="email_id" placeholder="YOUR EMAIL" /></div>
              <div align="center" class="next"> <input type="password" class="textbox"  name="password" id="password" placeholder="YOUR PASSWORD" /></div>
-            <div   align="center" class="nextnone"><img  class="thumblikebutton" id="like" src="images/likebutton.png"    /></div>
+            <div   align="center" class="nextnone"><img  class="thumblikebutton" id="like" src="images/configure.png"    /></div>
             
             </span>
            

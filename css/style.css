@@ -41,6 +41,7 @@ body{
  
 }
 .thumblike{width:35%;}
+.thumbconfig{width:35%;}
 .thumblikebutton{width:20%; margin-top:20px;}
  
 .textbox {
@@ -88,6 +89,9 @@ div.loading {
 	}
 	.thumblike{width:100%;
 	margin-top: 3%;
+	}
+	.thumbconfig{width:50%;
+	margin-top: 20%;
 	}
 	.thumblikebutton{width:40%;
 	margin-top: 10%;
