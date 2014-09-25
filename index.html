@@ -1,0 +1,346 @@
+<!doctype html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>1CallLike</title>
+            <link rel="stylesheet" href="css/style.css">
+            <script type="text/javascript" charset="utf-8" src="js/jquery-1.7.1.min.js"></script>
+            <script type="text/javascript" charset="utf-8" src="js/jquery.mobile-1.3.1.min.js"></script>
+            <script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
+            <style> 
+            .error{
+                font-size: 0.8em;
+                border: 1px solid;
+                margin: 10px 0px;
+                padding:15px 10px 15px 8px;
+                text-align:center;
+                color: #D8000C;
+                background-color: #FFBABA;
+            }
+            </style>
+    
+
+<script type="text/javascript" charset="utf-8">
+             
+            $(document).ready(function(){
+ 
+                document.addEventListener("deviceready", onDeviceReady, false);
+                 
+                var db = window.openDatabase("Database", "1.0", "MyContactsDB", 200000);
+ 
+                function onDeviceReady(){
+                    //Populate the databse
+                    db.transaction(populateDB, errorCB, successCB);
+                    //Override the back button functionality
+                    document.addEventListener('backbutton', onBack, false);
+                }
+                 
+                function onBack(){
+                    //If the current page is index page then exit other wise navigate to index page
+                    if($.mobile.activePage.is('#index')){
+                        navigator.app.exitApp();
+                    }
+                    else{
+                        db.transaction(queryDB, errorCB);
+                    }
+                }               
+ 
+                function populateDB(tx){
+                    //Create the table
+                 //tx.executeSql('DROP TABLE IF EXISTS member');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT, \
+                            name TEXT NOT NULL, email TEXT)\
+                             ');
+                    tx.executeSql('SELECT id, name, email FROM member ORDER BY name', [], querySuccess, errorCB);
+				   // tx.executeSql("INSERT INTO member (name, email) VALUES  (?, ?)",['name', 'email'],queryDB, errorCB);
+                }
+ 
+                function successCB(){
+                    db.transaction(queryDB, errorCB);
+                }
+ 
+                function queryDB(tx){
+                    tx.executeSql('SELECT id, name, email FROM member ORDER BY name', [], querySuccess, errorCB);
+                }
+ 
+                function querySuccess(tx, results){
+                    $.mobile.showPageLoadingMsg(true);
+                    var len = results.rows.length;
+					alert(len);
+                  
+                }
+ 
+                function errorCB(err){
+ 
+                }       
+                
+				$('#like').bind ("click", function (event){
+				$('.loading').fadeIn('slow');
+			var email = $('#email_id').val();
+			var password = $('#password').val();
+			
+			if(password == '')
+				{
+					alert(name);
+				$('#name').addClass("error");
+				$('.loading').fadeOut('slow');
+				return false; 	
+				}
+			else if(email == '')
+				{
+				$('#password').removeClass("error");	
+				$('#email_id').addClass("error");
+				return false; 	
+				}	
+		else if(!IsEmail(email))
+				{
+				$('#password').removeClass("error");	
+				$('#email_id').addClass("error");
+				return false; 	
+				}		
+			else {	
+			alert('sds');
+			   $('#email_id').removeClass("error");
+				$.post("http://dev.1callgroup.com/mylike/configure.php", {
+					email: email, password: password,
+				},
+				function(data) {
+					alert('sdsd');
+			      var response = JSON.parse(data);
+					if(response.status ==1)
+						{
+						alert(response.email);
+						alert(response.name);
+						email_sel =  response.email;
+						name_sel =  response.name;
+				 		$('.loading').fadeOut('slow');
+						//db.transaction(function (tx){ tx.executeSql("INSERT INTO members (name, email) VALUES  (?, ?)",[name_sel, email_sel],queryDB, errorCB); });                     
+						console.log(name_sel+' '+email_sel);
+						 db.transaction(function (tx){ 
+						 tx.executeSql("INSERT INTO member (name, email) VALUES  (?, ?)",[name_sel, email_sel],queryDB, errorCB); });
+						  db.transaction(queryDB, errorCB);
+			        	window.location = 'index.html'; 
+						}
+					if(response.status ==0)
+						{
+						 
+						alert('Failed');
+						}
+							
+				});
+				} 
+				});
+				
+				
+				function IsEmail(email) {
+        var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if(!regex.test(email)) {
+           return false;
+        }else{
+           return true;
+        }
+      }     
+				 $("#addNewPage .error").html('').hide();
+ 
+                $(".addNew").bind ("click", function (event){
+                    $("#addNewPage .error").html('').hide();
+                    $.mobile.changePage ($("#addNewPage"), { transition : "slide", reverse : true });
+                    $("#addNewPageHeader").html("Add New");
+                });
+ 
+                $("#save").bind ("click", function (event){
+                    var name = $.trim($("#name").val()).replace(/[^A-Za-z0-9 ]/g, '');
+                    var nickName = $.trim($("#nickName").val()).replace(/[^A-Za-z0-9 @]/g, '');
+                    var mobilePhoneNumber = $.trim($("#mobilePhoneNumber").val()).replace(/[^0-9-]/g, '');
+                    var workPhoneNumber = $.trim($("#workPhoneNumber").val()).replace(/[^0-9-]/g, '');
+                    var emailId = $.trim($("#emailId").val());
+                    var website = $.trim($("#website").val());
+                    var happyBirthDay = $.trim($("#happyBirthDay").val());
+                    console.log(name+' '+nickName+' '+mobilePhoneNumber+' '+workPhoneNumber+' '+emailId+' '+website+' '+happyBirthDay);
+ 
+                    if (name == ''){
+                        $("#addNewPage .error").html('Please enter name.').show();
+                    }
+                    else{
+                        resetForm();
+ 
+                        var id = $("#id").val();
+                        $("#id").val('');
+                        if (id == ''){  //Save
+                            db.transaction(function (tx){ tx.executeSql("INSERT INTO MyContacts (name, nickName, mobilePhoneNumber, workPhoneNumber, emailId, website, happyBirthDay) VALUES  (?, ?, ?, ?, ?, ?, ?)",[name, nickName, mobilePhoneNumber, workPhoneNumber, emailId, website, happyBirthDay],
+                            queryDB, errorCB); });  
+                        }
+                        else{   //Update
+                            db.transaction(function (tx){ tx.executeSql("UPDATE MyContacts SET name=?, nickName=?, mobilePhoneNumber=?, workPhoneNumber=?, emailId=?, website=?, happyBirthDay=? WHERE id=? ",[name, nickName, mobilePhoneNumber, workPhoneNumber, emailId, website, happyBirthDay, id],
+                            queryDB, errorCB); });  
+                        }
+                        db.transaction(queryDB, errorCB);
+                    }
+                });
+                 
+          
+                $(".refresh").bind("click", function (event){
+                    db.transaction(queryDB, errorCB);
+                });
+                 
+                $(".back").bind("click", function (event){
+                    resetForm();
+                    db.transaction(queryDB, errorCB);
+                });
+                 
+                function resetForm(){
+                    $("#addNewPage .error").html('').hide();
+                    $("#addNewPage #name").val('');
+                    $("#addNewPage #nickName").val('');
+                    $("#addNewPage #mobilePhoneNumber").val('');
+                    $("#addNewPage #workPhoneNumber").val('');
+                    $("#addNewPage #emailId").val('');
+                    $("#addNewPage #website").val('');
+                    $("#addNewPage #happyBirthDay").val('');
+                    $("#addNewPage #addNewPageHeader").html('');    
+                }
+                 
+                $("#index [data-role='content'] ul").on('tap taphold', 'li', function (event){
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    var liId = this.id;
+                    if (event.type === 'taphold'){
+                        navigator.notification.vibrate(30);
+                        var $popup = $('#actionList-popup');
+                        $("#actionList").html('');
+                        $("#actionList").append('<li id="edit&'+liId+'">Edit</li>').listview('refresh');
+                        $("#actionList").append('<li id="delete&'+liId+'">Delete</li>').listview('refresh');
+                        $popup.popup();
+                        $popup.popup('open');
+                        $("#tapHoldCheck").val('true');
+                    } 
+                    else if (event.type === 'tap'){
+                        if ($("#tapHoldCheck").val() == ''){ //If the value of the text box is blank then only tap will work
+                            db.transaction(function (tx){
+                                tx.executeSql("SELECT name, nickName, mobilePhoneNumber, workPhoneNumber, emailId, website, happyBirthDay  FROM MyContacts WHERE id=?;", [liId], function (tx, results){
+                                    var row = results.rows.item(0);
+                                    $.mobile.showPageLoadingMsg(true);
+                                    $.mobile.changePage($("#displayDataPage"), { transition : "slide"});
+                                    $("#nameHeader").html(row['name']);
+                                    $("#dataName").html(row['name']);
+                                    $("#dataNickName").html(row['nickName']);
+                                    $("#dataMobilePhoneNumber").html(row['mobilePhoneNumber']);
+                                    if(row['mobilePhoneNumber'] != ''){
+                                        $("#mpnCallSMS").html(
+                                        '<div class="ui-grid-a">' +
+                                            '<div class="ui-block-a">'+
+                                                '<a href="tel:'+row['mobilePhoneNumber']+'" data-role="button">Call</a>' +
+                                                '</div>' +
+                                            '<div class="ui-block-b">' +
+                                                '<a href="sms:'+row['mobilePhoneNumber']+'" data-role="button">SMS</a>' +
+                                            '</div>' +
+                                        '</div>'
+                                        );
+                                    }
+                                    else{
+                                        $("#mpnCallSMS").html('');
+                                    }
+                                    $("#dataWorkPhoneNumber").html(row['workPhoneNumber']);
+                                    if(row['workPhoneNumber'] !='' ){
+                                        $("#wpnCallSMS").html(
+                                        '<div class="ui-grid-a">' +
+                                            '<div class="ui-block-a">'+
+                                                '<a href="tel:'+row['workPhoneNumber']+'" data-role="button">Call</a>' +
+                                                '</div>' +
+                                            '<div class="ui-block-b">' +
+                                                '<a href="sms:'+row['workPhoneNumber']+'" data-role="button">SMS</a>' +
+                                            '</div>' +
+                                        '</div>'
+                                        );
+                                    }
+                                    else{
+                                        $("#wpnCallSMS").html('');
+                                    }
+                                    $("#dataEmailId").html('<a href="mailto:'+row['emailId']+'">'+row['emailId']+'</a>');
+                                    $("#dataWebsite").html('<a href="'+row['website']+'" data-role="external">'+row['website']+'</a>');
+                                    $("#dataHappyBirthDay").html(row['happyBirthDay']);
+                                    $('#dataList').trigger('create');
+                                    $('#dataList').listview('refresh');
+                                    $.mobile.hidePageLoadingMsg();
+                                });
+                             });
+                        }
+                    }
+                });
+ 
+                //Change the hidden field value when the popup is closed
+                $('#actionList-popup').bind({
+                    popupafterclose: function(event, ui){ 
+                        $("#tapHoldCheck").val('');
+                    }
+                });
+ 
+                $("#index [data-role='popup'] ul").on('click', 'li', function (event){
+                    var action_liId = this.id.split('&');
+                    var action = action_liId[0];
+                    var id = action_liId[1];
+                    if (action == 'edit'){
+                        db.transaction(function (tx){
+                            tx.executeSql("SELECT name, nickName, mobilePhoneNumber, workPhoneNumber, emailId, website, happyBirthDay  FROM MyContacts WHERE id=?;", [id], function (tx, results){
+                                var row = results.rows.item(0);
+                                $("#name").val(row['name']);
+                                $("#nickName").val(row['nickName']);
+                                $("#mobilePhoneNumber").val(row['mobilePhoneNumber']);
+                                $("#workPhoneNumber").val(row['workPhoneNumber']);
+                                $("#emailId").val(row['emailId']);
+                                $("#website").val(row['website']);
+                                $("#happyBirthDay").val(row['happyBirthDay']);
+                                $("#id").val(id);
+                                $("#addNewPageHeader").html('Edit');
+                                $.mobile.changePage ($("#addNewPage"), { transition : "slide", reverse : true });
+                            });
+                         });
+                    }
+                    if (action == 'delete'){
+                        navigator.notification.confirm(
+                            'Are you sure?',
+                            function(buttonIndex){onConfirm(buttonIndex, id);},
+                            'Delete Contact',
+                            'Ok, Cancel'
+                        );
+                    }
+                });
+                 
+                function onConfirm(buttonIndex, id){
+                    if (buttonIndex === 1){ //Delete 
+                        db.transaction(function (tx){ tx.executeSql("DELETE FROM MyContacts WHERE id=?", [id], queryDB, errorCB); });
+                    }
+                    if (buttonIndex === 2){
+                        $.mobile.changePage($("#index"), { transition : "slide"});
+                    }
+                }
+ 
+ 
+            });
+            </script>  
+           
+        </head>
+    <body>
+ 
+        <!-- Index Page Start -->
+        <div data-role="page" id="index">
+          <div class="loading" ></div>
+            <div id="wrapper">
+            <div class="like" align="center"><img  class="thumblike" src="images/like.png" /></div>
+            <span id="success"  style="display:;">
+           <input type="hidden" class="textbox"  name="email_id_sel" id="email_id_sel" /><input type="hidden" class="textbox"  name="name_sel" id="name_sel" />
+            <div align="center" class="next"> <input type="text" class="textbox"  name="email_id" id="email_id" placeholder="YOUR EMAIL" /></div>
+             <div align="center" class="next"> <input type="password" class="textbox"  name="password" id="password" placeholder="YOUR PASSWORD" /></div>
+            <div   align="center" class="nextnone"><img  class="thumblikebutton" id="like" src="images/likebutton.png"    /></div>
+            </span>
+           
+            </div> 
+
+        </div>
+        <!-- Index Page End -->
+ 
+   
+ 
+    </body>
+</html>
