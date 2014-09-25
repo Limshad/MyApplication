@@ -6,16 +6,16 @@
         id        = "com.fitho.sqlite"
         version   = "1.0.0">
 
-    <name>1Callgroup</name>
+    <name>1Call Like</name>
 
     <description>
-        1Callgroup
+        1CallGroup Solutions
     </description>
 
-    <author href="http://www.1callgroup.com" email="limshad@gmail.com">
-       1Callgroup
+    <author href="http://www.1callgroup.com" email="limshad@1callgroup.com">
+         1CallGroup Solutions
     </author>
-
+    <icon src="icon.png" />
     <!--
         If you do not want any permissions to be added to your app, add the
         following tag to your config.xml; you will still have the INTERNET
@@ -67,8 +67,8 @@
     -->
 
     <!-- Define app icon for each platform. -->
-    <icon src="icon.png" />
-     
+
+    
 
     <!--
         Define access to external domains.
