@@ -47,7 +47,7 @@ function onBodyLoad(){
 	 db.transaction(function(tx){
 
 		 // tx.executeSql('DROP TABLE IF EXISTS member');
-		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[],nullHandler,errorHandler);
+		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[]);
 	 },errorHandler,successCallBack);
 	  db.transaction(function(transaction) {
 	   transaction.executeSql('SELECT * FROM member;', [],
@@ -77,13 +77,13 @@ function onBodyLoad(){
 	   alert('Databases are not supported in this browser.');
 	   return;
 	 }
- 
+  
 	// this is the section that actually inserts the values into the User table
 	 db.transaction(function(transaction) {
-		 
-		transaction.executeSql('DROP TABLE IF EXISTS member',[], nullHandler, errorHandler);
+	//	 alert('sdsd');
+		transaction.executeSql('DROP TABLE IF EXISTS member');
 	});
- 
+  
 	 return false;
 }
  
@@ -99,24 +99,22 @@ function onBodyLoad(){
 			if(name == '')
 				{
 					//alert(name);
-				$('#name').addClass("error");
+				$('#error').html('<div class="alert alert-error">Enter Name</div>');	
 				return false; 	
 				}
 			else if(email == '')
 				{
-				$('#name').removeClass("error");	
-				$('#email_id').addClass("error");
+				$('#error').html('<div class="alert alert-error">Enter Email Id</div>');
 				return false; 	
 				}	
 		else if(!IsEmail(email))
 				{
-				$('#name').removeClass("error");	
-				$('#email_id').addClass("error");
+				$('#error').html('<div class="alert alert-error">Invalid Email Id</div>');	
 				return false; 	
 				}		
 			else {	
 			
-			   $('#email_id').removeClass("error");
+			   $('#error').html('');
 				$.post("http://dev.1callgroup.com/kiosk/mylike/index.php", {
 					email: email, name: name,email_sel: email_sel,
 				},
@@ -130,19 +128,21 @@ function onBodyLoad(){
 				       $('#success').hide();
 				       $('.loading').fadeOut('slow');
 				       var delay = 7000; 
-				       setTimeout(function(){ window.location = 'info.html'; }, delay);
+				       setTimeout(function(){ window.location = 'start.html'; }, delay);
 					   	}
-					else if(response.status ==0)
-						{
-						alert('Failed');
-						$('.loading').fadeOut('slow');
-						}
 					else if(response.status ==2)
 						{
 						DisableToDB();
-						window.location = 'index.html';
+						 $('#error').html('<div class="alert alert-error">Sorry, the kiosk is locked by admin</div>');
+						 var delay = 5000; 
+				        setTimeout(function(){ window.location = 'index.html'; }, delay);
 						}	
-				});
+				}).fail(function(){ 
+        $('#error').html('<div class="alert alert-error">Sorry, could not connect to server.</div>');
+	$('.loading').fadeOut('slow');
+	var delay = 4000; 
+	setTimeout(function(){   $('#error').html('<div class="alert alert-error">Sorry, could not connect to server.</div>'); }, delay);
+});
 				} 
 				});
 			
@@ -165,6 +165,7 @@ function onBodyLoad(){
 <input type="hidden" class="textbox"  name="email_id_sel" id="email_id_sel" />
 
 <div class="like" align="center"><img  class="thumblike" src="images/like.png" /></div>
+<span id="error"></span> 
 <span id="success"  style="display:;">
 <div align="center" class="next"> <input type="text" class="textbox"  name="name" id="name" placeholder="YOUR NAME" /></div>
 <div align="center" class="next"> <input type="text" class="textbox"  name="email_id" id="email_id" placeholder="YOUR EMAIL" /></div>

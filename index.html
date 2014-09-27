@@ -1,12 +1,12 @@
-<!doctype html>
-    <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>1CallLike</title>
-            <link rel="stylesheet" href="css/style.css">
-     <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-            <script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="" lang="">
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.js"></script>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.css" />
+<script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
            
 
 <script type="text/javascript" charset="utf-8">
@@ -46,15 +46,15 @@ function onBodyLoad(){
 
 	
 	 db.transaction(function(tx){
-
+         
 		  //tx.executeSql('DROP TABLE IF EXISTS member');
-		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[],nullHandler,errorHandler);
+		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[]);
 	 },errorHandler,successCallBack);
 	  db.transaction(function(transaction) {
 	   transaction.executeSql('SELECT * FROM member;', [],
 	     function(transaction, result) {
 	      if (result != null && result.rows != null) {
-			  //alert(result.rows.length);
+			//  alert(result.rows.length);
 			  if(result.rows.length > 0)
 			  	{
 				window.location = 'info.html';	
@@ -79,7 +79,7 @@ function AddValueToDB(name,email,image,facelink) {
 
 	// this is the section that actually inserts the values into the User table
 	 db.transaction(function(transaction) {
-		transaction.executeSql('INSERT INTO member(name, email,imagesrc,facelink) VALUES (?,?,?,?)',[name, email,image,facelink], nullHandler, errorHandler);
+		transaction.executeSql('INSERT INTO member(name, email,imagesrc,facelink) VALUES (?,?,?,?)',[name, email,image,facelink]);
 	});
  
 	 return false;
@@ -88,37 +88,40 @@ function AddValueToDB(name,email,image,facelink) {
 $(function() {
 $('#like').click(function(){
  
-				$('.loading').fadeIn('slow');
+				
 			var email = $('#email_id').val();
 			var password = $('#password').val();
 			
-			if(password == '')
+			if(email == '')
 				{
-				$('#name').addClass("error");
-				$('.loading').fadeOut('slow');
+			    $('#error').html('<div class="alert alert-error">Enter Email Id</div>');
+				 
 				return false; 	
 				}
-			else if(email == '')
+			else if(!IsEmail(email))
 				{
-				$('#password').removeClass("error");	
-				$('#email_id').addClass("error");
+				$('#error').html('<div class="alert alert-error">Invalid Email Id</div>');	
+				 
 				return false; 	
 				}	
-		else if(!IsEmail(email))
+			else if(password == '')
 				{
-				$('#password').removeClass("error");	
-				$('#email_id').addClass("error");
+				$('#error').html('<div class="alert alert-error">Enter Password</div>');
+			 
 				return false; 	
-				}		
+				}
+				
 			else {	
 			//alert('sds');
-			   $('#email_id').removeClass("error");
+			$('.loading').fadeIn('slow');
+			  $('#error').html('');
 				$.post("http://dev.1callgroup.com/kiosk/mylike/configure.php", {
 					email: email, password: password,
 				},
 				function(data) {
-					//alert('sdsd');
+				// alert(data);
 			      var response = JSON.parse(data);
+				  //alert(response.status);
 					if(response.status ==1)
 						{
 						//alert(response.email);
@@ -129,17 +132,28 @@ $('#like').click(function(){
 						var facelink =  response.facelink;
 				 		$('.loading').fadeOut('slow');
 						AddValueToDB(name_sel,email_sel,image_sel,facelink);
-						window.location = 'index.html'; 
+						window.location = 'start.html'; 
 						}
-					if(response.status ==0)
+					else if(response.status ==2)
 						{
 						 
-						alert('Failed');
+						$('#error').html('<div class="alert alert-error">Sorry, Account is not activated.</div>');
+						$('.loading').fadeOut('slow');
+						}	
+					else if(response.status ==0)
+						{
+						 
+						$('#error').html('<div class="alert alert-error">Invalid Authentication</div>');
 						$('.loading').fadeOut('slow');
 						}
 							
-				});
-				} 
+				}).fail(function(){ 
+        $('#error').html('<div class="alert alert-error">Could not connect to server</div>');
+	$('.loading').fadeOut('slow');
+	var delay = 4000; 
+	setTimeout(function(){   $('#error').html('<div class="alert alert-error">Sorry, could not connect to server.</div>'); }, delay);
+});
+ 				} 
 				});
 				});
 				
@@ -164,7 +178,10 @@ $('#like').click(function(){
         <div data-role="page" id="index">
           <div class="loading" ></div>
             <div id="wrapper">
+            
+            
             <div class="" align="center"><img  class="thumbconfig" src="images/config.png" /></div><br>
+             <span id="error"></span> 
             <span id="success"  style="display:;">
            
             <div align="center" class="next"> <input type="text" class="textbox"  name="email_id" id="email_id" placeholder="YOUR EMAIL" /></div>

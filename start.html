@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="" lang="">
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.js"></script>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.4/jquery.mobile.css" />
+<script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+ 
+<script type="text/javascript" charset="utf-8">
+  // global variables
+var db;
+var shortName = 'Kiosk';
+var version = '1.0';
+var displayName = 'Kiosk';
+var maxSize = 65535;
+
+// this is called when an error happens in a transaction
+function errorHandler(transaction, error) {
+   alert('Error: ' + error.message + ' code: ' + error.code);
+
+}
+
+// this is called when a successful transaction happens
+function successCallBack() {
+  // alert("DEBUGGING: success");
+}
+
+
+function nullHandler(){};
+
+function onBodyLoad(){
+
+ 
+
+	 if (!window.openDatabase) {
+	  
+	   alert('Databases are not supported in this browser.');
+	   return;
+	 }
+
+	 
+	 db = openDatabase(shortName, version, displayName,maxSize);
+
+	
+	 db.transaction(function(tx){
+
+		 // tx.executeSql('DROP TABLE IF EXISTS member');
+		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[]);
+	 },errorHandler,successCallBack);
+	  db.transaction(function(transaction) {
+	   transaction.executeSql('SELECT * FROM member;', [],
+	     function(transaction, result) {
+	      if (result != null && result.rows != null) {
+			 // alert(result.rows.length);
+			  if(result.rows.length == 0)
+			  	{
+				window.location = 'index.html';	
+				}
+		      var row = result.rows.item(0);
+		      $('#email_id_sel').val(row.email); 
+			  var simage = row.imagesrc;
+			  var facelinkup = row.facelink;
+			//  alert(simage);
+			  //alert(facelinkup);
+			   $('#mypage').attr('src', 'http://dev.1callgroup.com/kiosk/assets/customer_last_images/'+simage);
+			  $('#facebook_link').html('http://facebook.com/'+facelinkup)
+	      }
+	     },errorHandler);
+	 },errorHandler,nullHandler);
+}
+ 
+</script>
+</head>
+<body onload="onBodyLoad()">
+<div id="wrapper">
+<div class="like" align="center"><img  class="thumb" src="images/like.png" /></div>
+<div align="center"><a href="info.html"> <img src="images/start.png"  style="width:60%;"   /></a></div>
+</div> 
+</body>
+</html>
