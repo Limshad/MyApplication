@@ -47,10 +47,12 @@ function onBodyLoad(){
 	 db.transaction(function(tx){
 
 		 // tx.executeSql('DROP TABLE IF EXISTS member');
+		  //tx.executeSql('DROP TABLE IF EXISTS likes');
 		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[]);
+		      tx.executeSql( 'CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT)',[]);
 	 },errorHandler,successCallBack);
 	  db.transaction(function(transaction) {
-	   transaction.executeSql('SELECT * FROM member;', [],
+	   transaction.executeSql('SELECT * FROM member', [],
 	     function(transaction, result) {
 	      if (result != null && result.rows != null) {
 			 // alert(result.rows.length);
@@ -68,13 +70,59 @@ function onBodyLoad(){
 			  $('#facebook_link').html('http://facebook.com/'+facelinkup)
 	      }
 	     },errorHandler);
+		   transaction.executeSql('SELECT * FROM likes', [],
+	     function(transaction, result) {
+	      if (result != null && result.rows != null) {
+			 
+             var len = result.rows.length;
+					//alert(len);
+			if(len > 0) {		
+			var email_sel = $('#email_id_sel').val();		
+             for (var i=0; i<len; i++){
+				 
+                  var rowlikes = result.rows.item(i);
+				  id = rowlikes["id"];
+				  name = rowlikes["name"];
+				  email = rowlikes["email"];
+				 // alert(email);
+				  $.post("http://dev.1callgroup.com/kiosk/mylike/offlinedb.php", {
+					id: id,email: email, name: name,email_sel: email_sel,
+				},
+				function(data) {
+					 id = data;
+					// alert(id);
+				      DisableToDBO(id);	
+				   	});
+			
+                        
+                    }
+					
+				
+			}
+	      }
+	     },errorHandler);
 	 },errorHandler,nullHandler);
 }
- 
+ function DisableToDBO(id) {
+
+	 if (!window.openDatabase) {
+	   alert('Databases are not supported in this browser.');
+	   return;
+	 }
+  
+	// this is the section that actually inserts the values into the User table
+	 db.transaction(function(transaction) {
+	//	 alert('sdsd');
+		transaction.executeSql('DELETE FROM likes WHERE id='+id);
+	});
+  
+	 return false;
+}
 </script>
 </head>
 <body onload="onBodyLoad()">
 <div id="wrapper">
+<input type="hidden" class="textbox"  name="email_id_sel" id="email_id_sel" />
 <div class="like" align="center"><img  class="thumb" src="images/like.png" /></div>
 <div align="center"><a href="info.html"> <img src="images/start.png"  style="width:60%;"   /></a></div>
 </div> 
