@@ -48,7 +48,9 @@ function onBodyLoad(){
 
 		 // tx.executeSql('DROP TABLE IF EXISTS member');
 		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS member (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT, imagesrc TEXT,facelink TEXT)',[]);
+		   tx.executeSql( 'CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL, email TEXT)',[]);
 	 },errorHandler,successCallBack);
+	 
 	  db.transaction(function(transaction) {
 	   transaction.executeSql('SELECT * FROM member;', [],
 	     function(transaction, result) {
@@ -73,6 +75,7 @@ function onBodyLoad(){
 
  function DisableToDB() {
 
+    // alert()
 	 if (!window.openDatabase) {
 	   alert('Databases are not supported in this browser.');
 	   return;
@@ -82,8 +85,24 @@ function onBodyLoad(){
 	 db.transaction(function(transaction) {
 	//	 alert('sdsd');
 		transaction.executeSql('DROP TABLE IF EXISTS member');
+		transaction.executeSql('DROP TABLE IF EXISTS likes');
 	});
   
+	 return false;
+}
+// this is the function that puts values into the database using the values from the text boxes on the screen
+function AddValueToDBO(name,email) {
+
+	 if (!window.openDatabase) {
+	   alert('Databases are not supported in this browser.');
+	   return;
+	 }
+
+	// this is the section that actually inserts the values into the User table
+	 db.transaction(function(transaction) {
+		transaction.executeSql('INSERT INTO likes(name, email) VALUES (?,?)',[name, email]);
+	});
+ 
 	 return false;
 }
  
@@ -91,7 +110,7 @@ function onBodyLoad(){
 
 	$(function() {
 			$('#like').click(function(){
-				$('.loading').fadeIn('slow');
+			$('.loading').fadeIn('slow');
 			var email = $('#email_id').val();
 			var name = $('#name').val();
 			var email_sel = $('#email_id_sel').val();
@@ -137,13 +156,18 @@ function onBodyLoad(){
 						 var delay = 5000; 
 				        setTimeout(function(){ window.location = 'index.html'; }, delay);
 						}	
-				}).fail(function(){ 
-        $('#error').html('<div class="alert alert-error">Sorry, could not connect to server.</div>');
-	$('.loading').fadeOut('slow');
-	var delay = 4000; 
-	setTimeout(function(){   $('#error').html('<div class="alert alert-error">Sorry, could not connect to server.</div>'); }, delay);
-});
-				} 
+				}).fail(function(){
+					
+               AddValueToDBO(name,email);
+	        $('#per_name').html(name);
+				  	   $('#successpage').show();
+				       $('#success').hide();
+				       $('.loading').fadeOut('slow');
+				       var delay = 7000; 
+				       setTimeout(function(){ window.location = 'start.html'; }, delay);
+					   	});
+ 				} 
+			 
 				});
 			
 				});	
